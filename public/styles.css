@@ -1,0 +1,106 @@
+body {
+  background-color: #222;
+  color: #fff;
+  padding: 16px;
+  font-family: "Trebuchet MS", sans-serif;
+  line-height: normal;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+header {
+  border: 1px solid #ddd;
+  padding: 6px;
+  margin-bottom: 6px;
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+}
+
+header select,
+button {
+  padding: 4px;
+  border: none;
+}
+
+header select {
+  width: 14rem;
+  text-align: center;
+}
+
+.items-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.item {
+  border: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  padding: 4px;
+  width: calc(25% - 4px - 1px - 8px);
+  text-align: center;
+  color: #eee;
+  padding-top: 10px;
+}
+
+.listed,
+.unlisted {
+  background-color: #181818;
+}
+
+.listed {
+  background-color: rgba(0, 255, 0, 0.05);
+}
+
+.unlisted {
+  background-color: rgba(255, 0, 0, 0.05);
+}
+
+.item li {
+  margin-bottom: 4px;
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+.name,
+.base {
+  font-size: 1.25em;
+  color: #ffd700;
+}
+
+.price {
+  // font-weight: bold;
+  font-size: 1em;
+  margin-bottom: 6px;
+}
+
+.implicit,
+.explicit {
+  color: #499bd8;
+}
+
+.base::after,
+.implicits::after,
+.price::before {
+  content: "";
+  display: block;
+  margin: auto;
+  height: 1px;
+  width: 80%;
+  background-color: #999;
+  margin-top: 6px;
+  margin-bottom: 6px;
+}
+
+.fractured {
+  color: #d29a2e;
+}
+
+.crafted {
+  color: #b0e0e6;
+}

@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% for (items, status) in [(listed_items, "listed"), (unlisted_items, "unlisted")] %}
+    {% if items %}
+      <ul class="items-container">
+        {% for item in items %}        
+          <li class="{{ "item" ~ " " ~ status }}">
+            {% set name = item.name() %}
+            {% if name %}
+              <p class="name">{{ name }}</p>
+            {% endif %}
+
+            {% set base = item.base() %}
+            {% if base %}
+              <p class="base">{{ base }}</p>
+            {% endif %}
+
+            {% set implicits = item.implicits() %}
+            {% set fractureds = item.fractureds() %}
+            {% set explicits = item.explicits() %}
+            {% set crafteds = item.crafteds() %}
+
+            {% if implicits or fractureds or explicits or crafteds  %}
+              <ul class="props">
+
+                  {% if implicits %}
+                    <ul class="implicits">
+                      {% for implicit in implicits %}
+                        <li class="implicit">{{ implicit }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+
+                  {% if fractureds %}
+                    <ul>
+                      {% for fractured in fractureds %}
+                        <li class="fractured">{{ fractured }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+
+                  {% if explicits %}
+                    <ul>
+                      {% for explicit in explicits %}
+                        <li class="explicit">{{ explicit }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+
+                  {% if crafteds %}
+                    <ul>
+                      {% for crafted in crafteds %}
+                        <li class="crafted">{{ crafted }}</li>
+                      {% endfor %}
+                    </ul>
+                  {% endif %}
+
+              </ul>
+            {% endif %}
+
+            <p class="price">{{ item.note() or "empty price note" }}</p>
+
+          </li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endfor %}
+{% endblock content %}

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+
+<html>
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+    <title>u&#x1F62D;hhh</title>
+
+    <script src={{ url_for("static", filename="main.js" ) }}></script>
+
+    <link rel="stylesheet" type="text/css" href={{ url_for("static", filename="reset.css" ) }}>
+    <link rel="stylesheet" type="text/css" href={{ url_for("static", filename="styles.css" ) }}>
+  </head>
+
+  <body>
+
+    <header>
+      <button id="update-button" onclick="forceUpdate()">force update</button>
+      <select onchange="selectToken(this.value)">
+        {% for token_name in tokens_names %}
+          {% if token_name == selected_token_name  %}
+            <option selected="true">{{ token_name }}</option>          
+          {% else %}
+            <option>{{ token_name }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+      <select onchange="selectSnapshot(this.value)">
+        {% for snapshot in snapshots %}
+          {% if snapshot == selected_snapshot %}
+            <option selected="true">{{ snapshot }}</option>
+          {% else %}
+            <option>{{ snapshot }}</option>
+          {% endif %}
+        {% endfor %}
+      </select>
+    </header>
+
+    <main>
+      {% block content %}{% endblock content %}
+    </main>
+
+  </body>
+
+</html>
