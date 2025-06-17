@@ -1,6 +1,4 @@
-# LEAGUE = "Affliction"
-# POESESSID = ""
-
+import logging
 import requests
 import json
 import time
@@ -21,8 +19,11 @@ class Result:
             and self.implicits() == other.implicits()
         )
 
+    def __lt__(self, other: typing.Self):
+        return self.name() < other.name()
+
     def __hash__(self) -> int:
-        return hash(f"{self.name()}{self.base()}{self.implicits()}")
+        return hash(f"{self.name()}{self.base()}")
 
     def pretty_print(self):
         print(self.id())
@@ -74,8 +75,17 @@ class Result:
         out = self.__item_param(pa)
         return list(out) if out else []
 
+    def compare(self, other: typing.Self) -> bool:
+        return (
+            self.name() == other.name()
+            and self.base() == other.base()
+            and self.implicits() == other.implicits()
+            and self.price() == other.price()
+        )
+
     def id(self) -> str:
-        return self.data["id"]
+        return f"{self.name()}{self.base()}"
+        # return self.data["id"]
 
     def name(self) -> str:
         return self.__item_param("name") or ""
@@ -96,13 +106,29 @@ class Result:
         return self.__item_param_list("craftedMods")
 
     def note(self) -> str:
-        return self.__item_param("note") or ""
+        listing_price = self.listing_price()
+        return (
+            f"{listing_price["type"]} {listing_price["amount"]} {listing_price["currency"]}"
+            if "type" in listing_price
+            else ""
+        )
+        # return self.__item_param("note") or ""
+
+    def listing_price(self) -> str:
+        return self.data["listing"]["price"] if "price" in self.data["listing"] else ""
+
+    def price(self) -> float:
+        note = self.note()
+        return float(note.split(" ")[1]) or 0 if note else 0
 
 
 class Scraper:
-    def __init__(self, league: str = "Standard", session: str = ""):
-        self.league = league
-        self.session = session
+    def __init__(
+        self, logger: logging.Logger, league: str = "Standard", session: str = ""
+    ):
+        self.league: str = league
+        self.session: str = session
+        self.logger: logging.Logger = logger
 
     def headers(self):
         return {
@@ -112,18 +138,21 @@ class Scraper:
             "Cookie": f"POESESSID={self.session}",
         }
 
+    def print_stage(self, message: str):
+        self.logger.info(message)
+
     def process_tokens(self, tokens: dict[str, str]) -> dict[str, list[Result]]:
-        out = {}
+        out: dict[str, list[Result]] = {}
         for name, token in tokens.items():
-            print(f"processing '{name}'", flush=True)
-            print("fetching item ids...", end=" ", flush=True)
+            self.print_stage(f"processing '{name}'")
+            self.print_stage("fetching item ids")
             items = self.item_ids(token)
-            print("OK", flush=True)
-            print("fetching items data...", end=" ", flush=True)
+            self.print_stage("fetching items data")
             data = self.items_data(items)
-            print("OK", flush=True)
             out[name] = data
-        print("tokens processing finished", flush=True)
+            self.print_stage("done, waiting for 5 seconds")
+            time.sleep(5)
+        self.print_stage("finished processing tokens")
         return out
 
     def item_ids(self, token: str) -> list[str]:
@@ -137,28 +166,31 @@ class Scraper:
         desc = requests.post(url=url, headers=self.headers(), json=json.loads(mes_desc))
 
         if asc.status_code == 200 and desc.status_code == 200:
-            ids = asc.json()["result"] + desc.json()["result"]
-            return list(set(ids))
+            ids: list[str] = asc.json()["result"] + desc.json()["result"]
+            uniques = list(set(ids))
+            self.print_stage(f"200 OK: {len(uniques)} ids")
+            return uniques
 
+        self.print_stage(f"failed: asc {asc.status_code}, desc {desc.status_code}")
         return []
 
     def items_data(self, items: list[str]) -> list[Result]:
         n = len(items)
-        items_data = []
+        items_data: list[Result] = []
 
         def grouper(it: list[str], n: int):
             return zip_longest(*([iter(it)] * n))
 
-        for chunk in grouper(items, 10):
-            items = [item for item in chunk if item]
+        for index, batch in enumerate(grouper(items, 10)):
+            items = [item for item in batch if item]
             url = f"https://www.pathofexile.com/api/trade/fetch/{','.join(items)}"
 
             res = requests.get(url=url, headers=self.headers())
 
             if res.status_code != 200:
-                print(res.status_code, end=" ", flush=True)
+                self.print_stage(f"batch {index} failed: {res.status_code}")
             else:
-                print("+", end=" ", flush=True)
+                self.print_stage(f"batch {index}: 200 OK")
                 items_data.extend([Result(data) for data in res.json()["result"]])
 
             # ghetto rate limiting

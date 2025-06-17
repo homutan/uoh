@@ -1,2 +1,8 @@
+.vscode
 cache
 __pycache__
+_*/
+.env
+Justfile
+message/*
+!message/.gitkeep

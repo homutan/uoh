@@ -1,1 +1,0 @@
-{"query":{"status":{"option":"online"},"stats":[{"type":"and","filters":[{"id":"implicit.stat_1880071428","disabled":false}],"disabled":false}],"filters":{"misc_filters":{"filters":{"corrupted":{"option":"false"}},"disabled":false},"type_filters":{"filters":{"rarity":{"option":"nonunique"},"category":{"option":"armour.helmet"}},"disabled":false}}},"sort":{"price":"asc"}}

@@ -22,7 +22,9 @@ header {
 }
 
 header select,
-button {
+button,
+p,
+span {
   padding: 4px;
   border: none;
 }
@@ -30,6 +32,10 @@ button {
 header select {
   width: 14rem;
   text-align: center;
+}
+
+header input[type="text"] {
+  width: 14rem;
 }
 
 .items-container {
@@ -49,7 +55,8 @@ header select {
 }
 
 .listed,
-.unlisted {
+.unlisted,
+.waiting {
   background-color: #181818;
 }
 
@@ -59,6 +66,10 @@ header select {
 
 .unlisted {
   background-color: rgba(255, 0, 0, 0.05);
+}
+
+.waiting {
+  background-color: rgba(255, 255, 0, 0.1);
 }
 
 .item li {

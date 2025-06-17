@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block content %}
-  {% for (items, status) in [(listed_items, "listed"), (unlisted_items, "unlisted")] %}
+  {% for (items, status) in [(listed_items, "listed"), (unlisted_items, "unlisted"), (rest_items, "waiting")] %}
     {% if items %}
       <ul class="items-container">
         {% for item in items %}        

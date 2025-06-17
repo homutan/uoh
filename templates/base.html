@@ -20,22 +20,27 @@
       <button id="update-button" onclick="forceUpdate()">force update</button>
       <select onchange="selectToken(this.value)">
         {% for token_name in tokens_names %}
-          {% if token_name == selected_token_name  %}
-            <option selected="true">{{ token_name }}</option>          
-          {% else %}
-            <option>{{ token_name }}</option>
-          {% endif %}
+            <option {{ 'selected="true"' if token_name == selected_token_name }}>{{ token_name }}</option>          
         {% endfor %}
       </select>
       <select onchange="selectSnapshot(this.value)">
         {% for snapshot in snapshots %}
-          {% if snapshot == selected_snapshot %}
-            <option selected="true">{{ snapshot }}</option>
-          {% else %}
-            <option>{{ snapshot }}</option>
-          {% endif %}
+            <option {{ 'selected="true"' if snapshot == selected_snapshot }}>{{ snapshot }}</option>
         {% endfor %}
       </select>
+      <select onchange="selectLatest(this.value)">
+        {% for snapshot in snapshots %}
+          <option {{ 'selected="true"' if snapshot == selected_latest }}>{{ snapshot }}</option>
+        {% endfor %}
+      </select>
+      <p>{{ time }}</p>
+      
+      <!-- <div class="filter-container"> -->
+        <input  type="text" onchange="filterItems(this.value)" />
+        {% set items_len = [listed_items, unlisted_items, rest_items]|map('length')|sum %}
+        <span id="filter-status">{{ items_len }}/{{ items_len }}</span>
+      <!-- </div> -->
+
     </header>
 
     <main>

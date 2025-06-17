@@ -9,10 +9,10 @@ FILENAME_TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"  # 20240309213217
 
 
 class ResultsCache:
-    def __init__(self, dir="cache"):
+    def __init__(self, dir: str = "cache"):
         if not os.path.exists(dir):
             os.mkdir(dir)
-        self.dir = dir
+        self.dir: str = dir
 
     def __token_dir(self, token: str) -> str:
         token_dir = f"{self.dir}/{token}"
@@ -25,17 +25,16 @@ class ResultsCache:
         return f"{self.__token_dir(token)}/{filename}"
 
     def has_snapshot(self, token: str, name: str) -> bool:
-        for file in os.listdir(self.__token_dir(token)):
-            if file == name:
-                return True
-        return False
+        return name in os.listdir(self.__token_dir(token))
 
     def snapshots(self, token: str) -> list[str]:
-        return list(reversed(os.listdir(self.__token_dir(token))))
+        snapshots = os.listdir(self.__token_dir(token))
+        snapshots.reverse()
+        return snapshots
 
     def write(self, token: str, items_data: list[Result]):
         with open(self.__token_file(token=token), mode="w") as cache:
-            cache.write(json.dumps([r.data for r in items_data], sort_keys=True))
+            _ = cache.write(json.dumps([r.data for r in items_data], sort_keys=True))
 
     def at(self, token: str, file: str) -> list[Result]:
         if not os.path.exists(self.__token_file(token=token, file=file)):
@@ -50,15 +49,23 @@ class ResultsCache:
             files.append((timestamp, file))
         return files
 
-    def between(self, token: str, file: str) -> list[Result]:
+    def between(self, token: str, begin: str, end: str | None = None) -> list[Result]:
         files = self.__token_files(token)
-        if not files or not os.path.exists(self.__token_file(token=token, file=file)):
+        if not files or not os.path.exists(self.__token_file(token=token, file=begin)):
             return []
 
-        files.sort(reverse=True)
-        begin = files.index((datetime.strptime(file, FILENAME_TIMESTAMP_FORMAT), file))
-        out = []
-        for _, ifile in files[begin:]:
+        files.sort(reverse=False)
+        bi = files.index((datetime.strptime(begin, FILENAME_TIMESTAMP_FORMAT), begin))
+
+        if end:
+            be = files.index((datetime.strptime(end, FILENAME_TIMESTAMP_FORMAT), end))
+        else:
+            be = len(files)
+
+        # print("collecting items in range", bi, ":", be)
+
+        out: list[list[Result]] = []
+        for _, ifile in files[bi:be]:
             with open(self.__token_file(token=token, file=ifile)) as cache:
                 out.append([Result(data) for data in json.loads(cache.read())])
 
